@@ -22,7 +22,8 @@
             [toucan.util.test :as tt]
             [metabase.sync-database.cached-values :as cached-values]
             [clojure.tools.logging :as log]
-            [metabase.sync-database.analyze :as analyze]))
+            [metabase.sync-database.analyze :as analyze]
+            [metabase.sync-database.classify :as classify]))
 
 (def ^:private ^:const sync-test-tables
   {"movie"  {:name "movie"
@@ -147,9 +148,13 @@
                                   :base_type    :type/Text})]})]
   (tt/with-temp Database [db {:engine :sync-test}]
     (sync-database! db)
+    (cached-values/cache-field-values-for-database! db)
+    (classify/classify-table! (Table (id :users)))
     ;; we are purposely running the sync twice to test for possible logic issues which only manifest
     ;; on resync of a database, such as adding tables that already exist or duplicating fields
     (sync-database! db)
+    (cached-values/cache-field-values-for-database! db)
+    (classify/classify-database! db)
     (mapv table-details (db/select Table, :db_id (u/get-id db), {:order-by [:name]}))))
 
 
@@ -183,6 +188,7 @@
                                        :db_id        (u/get-id db)}]]
     (sync-table! table)
     (cached-values/cache-field-values-for-table! table)
+    (classify/classify-table! (Table (id :users)))
     (table-details (Table (:id table)))))
 
 

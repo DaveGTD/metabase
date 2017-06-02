@@ -70,7 +70,7 @@
 ;; ANALYZE-TABLE
 
 (expect
-  {:row_count 100,
+  {#_:row_count #_100, ;; drivers are no longer responsible for counting rows when analyzing tables
    :fields    [{:id (id :venues :category_id)}
                {:id (id :venues :id)}
                {:id (id :venues :latitude)}

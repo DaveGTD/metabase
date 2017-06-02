@@ -17,7 +17,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Drivers use these to get field values
-(defn table-row-count
+#_(defn table-row-count
   "Determine the count of rows in TABLE by running a simple structured MBQL query."
   [table]
   {:pre [(integer? (:id table))]}
@@ -75,7 +75,7 @@
   [driver & {:keys [calculate-row-count?]
              :or   {calculate-row-count?  true}}]
   (fn [driver table new-field-ids]
-    {:row_count (when calculate-row-count? (u/try-apply table-row-count table))
+    {#_:row_count #_(when calculate-row-count? (u/try-apply table-row-count table))
      :fields    (for [id new-field-ids]
                   (extract-field-values (field/Field id) {:id id}))}))
 
@@ -93,7 +93,7 @@
   "Analyze the data shape for a single `Table`."
   [driver {table-id :id, :as table}]
   (log/error (u/format-color 'red "cache-table-data-shape! %s" table))
-  (let [new-field-ids (db/select-ids field/Field, :table_id table-id, :visibility_type [:not= "retired"], #_:last_analyzed #_nil)]
+  (let [new-field-ids (db/select-ids field/Field, :table_id table-id, :visibility_type [:not= "retired"], :last_analyzed nil)]
     ;; TODO: this call should include the database
     (when-let [table-stats (u/prog1 (driver/analyze-table driver table new-field-ids)
                              (when <>
